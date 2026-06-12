@@ -73,3 +73,42 @@ hr {
     width: 100%;
   }
 }
+.weather-card {
+  max-width: 650px;
+  margin: 35px auto;
+  padding: 25px 40px;
+  background-color: #fff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr;
+  align-items: center;
+  gap: 20px;
+}
+
+.weather-card img {
+  width: 70px;
+  height: 70px;
+}
+
+.weather-card h3 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.weather-card p {
+  color: #333;
+  font-size: 1rem;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .weather-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 25px;
+  }
+
+  .weather-card img {
+    margin: 0 auto;
+  }
+}
