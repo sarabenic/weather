@@ -1,7 +1,7 @@
 const apiKey = "ae7ec1ee94ac4ccc1a65ea1aa8e94300";
 
 $(document).ready(function () {
- $("#city-input").on("keypress", function (event) {
+  $("#city-input").on("keypress", function (event) {
     if (event.key === "Enter") {
       const city = $("#city-input").val().trim();
 
@@ -10,12 +10,35 @@ $(document).ready(function () {
       }
     }
   });
+
+  $("#location-button").on("click", function () {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(getWeatherByLocation);
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  });
 });
 
 function getWeatherByCity(city) {
   const url =
     "https://api.openweathermap.org/data/2.5/weather?q=" +
     encodeURIComponent(city) +
+    "&units=metric&appid=" +
+    apiKey;
+
+  getWeather(url);
+}
+
+function getWeatherByLocation(position) {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+
+  const url =
+    "https://api.openweathermap.org/data/2.5/weather?lat=" +
+    latitude +
+    "&lon=" +
+    longitude +
     "&units=metric&appid=" +
     apiKey;
 
