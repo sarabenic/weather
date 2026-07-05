@@ -13,6 +13,14 @@ $(document).ready(function () {
       }
     }
   });
+
+  $("#location-button").on("click", function () {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(getWeatherByLocation);
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  });
 });
 
 $("#location-button").on("click", function () {
