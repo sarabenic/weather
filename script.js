@@ -1,7 +1,10 @@
 const apiKey = "ae7ec1ee94ac4ccc1a65ea1aa8e94300";
+const storageKey = "weatherSearches";
 
 $(document).ready(function () {
-  $("#city-input").on("keypress", function (event) {
+  renderLatestRequests();
+
+ $("#city-input").on("keypress", function (event) {
     if (event.key === "Enter") {
       const city = $("#city-input").val().trim();
 
@@ -19,6 +22,14 @@ $(document).ready(function () {
     }
   });
 });
+
+$("#location-button").on("click", function () {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(getWeatherByLocation);
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  });
 
 function getWeatherByCity(city) {
   const url =
@@ -52,7 +63,11 @@ function getWeather(url) {
   })
     .done(function (data) {
       const weather = createWeatherObject(data);
+
       renderWeather(weather);
+      saveSearch(weather);
+      renderLatestRequests();
+
       $("#city-input").val("");
     })
     .fail(function () {
@@ -81,6 +96,48 @@ function renderWeather(weather) {
       <p>${weather.wind.toFixed(2)} m/s</p>
     </div>
   `);
+}
+
+function saveSearch(weather) {
+  const searches = getSearches();
+
+  searches.unshift(weather);
+
+  if (searches.length > 5) {
+    searches.pop();
+  }
+
+  localStorage.setItem(storageKey, JSON.stringify(searches));
+}
+
+function getSearches() {
+  const savedSearches = localStorage.getItem(storageKey);
+
+  if (savedSearches === null) {
+    return [];
+  }
+
+  return JSON.parse(savedSearches);
+}
+
+function renderLatestRequests() {
+  const searches = getSearches();
+
+  $("#latest-requests").html("");
+
+  for (let i = 0; i < searches.length; i++) {
+    const weather = searches[i];
+    const iconUrl = getIconUrl(weather.icon);
+
+    $("#latest-requests").append(`
+      <div class="latest-card">
+        <img src="${iconUrl}" alt="Weather icon">
+        <h3>${weather.city}</h3>
+        <p>${weather.temperature.toFixed(2)} °C</p>
+        <p>${weather.wind.toFixed(2)} m/s</p>
+      </div>
+    `);
+  }
 }
 
 function getIconUrl(iconName) {
