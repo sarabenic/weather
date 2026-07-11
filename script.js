@@ -23,14 +23,6 @@ $(document).ready(function () {
   });
 });
 
-$("#location-button").on("click", function () {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(getWeatherByLocation);
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  });
-
 function getWeatherByCity(city) {
   const url =
     "https://api.openweathermap.org/data/2.5/weather?q=" +
@@ -62,6 +54,13 @@ function getWeather(url) {
     method: "GET"
   })
     .done(function (data) {
+      const cityInput = document.getElementById("city-input");
+      const popover = bootstrap.Popover.getInstance(cityInput);
+
+    if (popover) {
+    popover.hide();
+}
+
       const weather = createWeatherObject(data);
 
       renderWeather(weather);
@@ -72,7 +71,15 @@ function getWeather(url) {
     })
     .fail(function () {
       $("#weather-result").html("");
-      alert("We couldn't find the city, try again!");
+
+      const cityInput = document.getElementById("city-input");
+      const popover = bootstrap.Popover.getOrCreateInstance(cityInput);
+
+      popover.show();
+
+      setTimeout(function () {
+      popover.hide();
+      }, 3000);
     });
 }
 
