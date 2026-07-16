@@ -4,7 +4,8 @@ const storageKey = "weatherSearches";
 $(document).ready(function () {
   renderLatestRequests();
 
- $("#city-input").on("keypress", function (event) {
+  // Söker väder när användaren skriver en stad och trycker enter
+  $("#city-input").on("keypress", function (event) {
     if (event.key === "Enter") {
       const city = $("#city-input").val().trim();
 
@@ -14,6 +15,7 @@ $(document).ready(function () {
     }
   });
 
+  // Hämtar väder för användarens nuvarande plats
   $("#location-button").on("click", function () {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(getWeatherByLocation);
@@ -48,6 +50,7 @@ function getWeatherByLocation(position) {
   getWeather(url);
 }
 
+// Hämtar väderdata från OpenWeather med Ajax
 function getWeather(url) {
   $.ajax({
     url: url,
@@ -57,9 +60,10 @@ function getWeather(url) {
       const cityInput = document.getElementById("city-input");
       const popover = bootstrap.Popover.getInstance(cityInput);
 
-    if (popover) {
-    popover.hide();
-}
+      // Döljer felmeddelandet om en ny sökning lyckas
+      if (popover) {
+        popover.hide();
+    }
 
       const weather = createWeatherObject(data);
 
@@ -69,21 +73,26 @@ function getWeather(url) {
 
       $("#city-input").val("");
     })
+
+    
     .fail(function () {
+      // Tar bort det gamla väderkortet om sökningen misslyckas
       $("#weather-result").html("");
 
       const cityInput = document.getElementById("city-input");
       const popover = bootstrap.Popover.getOrCreateInstance(cityInput);
 
+      // Visar Bootstrap popover vid felaktig stad
       popover.show();
 
       setTimeout(function () {
-      popover.hide();
+        popover.hide();
       }, 3000);
     });
 }
 
 function createWeatherObject(data) {
+  // Plockar ut bara den data som behövs från API-svaret
   return {
     city: data.name,
     temperature: data.main.temp,
@@ -95,6 +104,7 @@ function createWeatherObject(data) {
 function renderWeather(weather) {
   const iconUrl = getIconUrl(weather.icon);
 
+  // Visar aktuellt väder på sidan
   $("#weather-result").html(`
     <div class="weather-card">
       <img src="${iconUrl}" alt="Weather icon">
@@ -108,17 +118,19 @@ function renderWeather(weather) {
 function saveSearch(weather) {
   const searches = getSearches();
 
+  // Lägger den senaste sökningen först i listan
   searches.unshift(weather);
 
+  // Sparar bara de fem senaste sökningarna
   if (searches.length > 5) {
     searches.pop();
   }
 
-  localStorage.setItem(storageKey, JSON.stringify(searches));
+  window.localStorage.setItem(storageKey, JSON.stringify(searches));
 }
 
 function getSearches() {
-  const savedSearches = localStorage.getItem(storageKey);
+  const savedSearches = window.localStorage.getItem(storageKey);
 
   if (savedSearches === null) {
     return [];
@@ -132,6 +144,7 @@ function renderLatestRequests() {
 
   $("#latest-requests").html("");
 
+  // Visar max fem senaste sökningar från localStorage
   for (let i = 0; i < searches.length; i++) {
     const weather = searches[i];
     const iconUrl = getIconUrl(weather.icon);
